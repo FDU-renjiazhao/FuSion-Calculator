@@ -138,7 +138,7 @@
             font-size: 3.8rem;
             margin: 15px 0;
             font-weight: 700;
-            text-shadow: 0 0 8px rgba(229, 62, 62, 0.2);
+            text-shadow: 0 0 8px rgba(22, 62, 62, 0.2);
             transition: all 0.3s ease;
             font-family: 'Roboto', sans-serif;
             letter-spacing: -1px;
@@ -233,27 +233,27 @@
             <div class="form-group">
                 <label for="smoking_pyrs">Smoking Pack-Years</label>
                 <div class="formula-note">(Cigarettes per day / 20) × Years smoked</div>
-                <input type="number" id="smoking_pyrs" min="0" max="70" placeholder="0-70 Pack-Years">
+                <input type="number" id="smoking_pyrs" min="0" max="150" placeholder="0-150 Pack-Years">
             </div>
             
             <div class="form-group">
                 <label for="AFP">Alpha-fetoprotein (AFP) (ng/mL)</label>
-                <input type="number" id="AFP" min="0" max="1000" step="0.01" placeholder="0-1000 ng/mL">
+                <input type="number" id="AFP" min="0" max="200" step="1" placeholder="0-200 ng/mL">
             </div>
             
             <div class="form-group">
                 <label for="HBsAg">Hepatitis B Surface Antigen (HBsAg) (IU/mL)</label>
-                <input type="number" id="HBsAg" min="0" max="1000" step="0.01" placeholder="0-1000 IU/mL">
+                <input type="number" id="HBsAg" min="0" max="250" step="1" placeholder="0-250 IU/mL">
             </div>
             
             <div class="form-group">
                 <label for="CEA">Carcinoembryonic Antigen (CEA) (ng/mL)</label>
-                <input type="number" id="CEA" min="0" max="1000" step="0.01" placeholder="0-1000 ng/mL">
+                <input type="number" id="CEA" min="0" max="50" step="1" placeholder="0-50 ng/mL">
             </div>
             
             <div class="form-group">
                 <label for="CYFRA_211">Cytokeratin 19 Fragment (CYFRA 21-1) (ng/mL)</label>
-                <input type="number" id="CYFRA_211" min="0" max="1000" step="0.01" placeholder="0-1000 ng/mL">
+                <input type="number" id="CYFRA_211" min="0" max="20" step="1" placeholder="0-20 ng/mL">
             </div>
         </div>
         
@@ -263,7 +263,7 @@
         
         <div class="result-container" id="resultSection">
             <div class="risk-level">
-                Your 5-Year Risk Probability:
+                Your 5-year risk probability for occurring one of the following cancers — lung, esophageal, gastric, liver, or colorectal — is:
                 <div class="risk-value" id="riskValue">0%</div>
             </div>
             
@@ -275,6 +275,8 @@
             
             <div class="explanation">
                 <p>Note: This tool calculates risk values based on a predictive model algorithm from clinical research. The results are for reference only and cannot replace professional medical diagnosis. If you have health concerns, please consult a medical professional.</p>
+                <p>      </p>
+                <p>Note: If any of your input values exceed the model’s acceptable range (except age), you may enter the maximum allowed value to proceed with the prediction. However, this suggests that you may already be in a high-risk group for cancer, and it is strongly recommended that you seek medical evaluation.</p>
             </div>
         </div>
         
@@ -306,8 +308,8 @@
             
             // 风险分级阈值
             const riskThresholds = {
-                lowMedium: 0.005619,   // 低风险与中风险的分界点
-                mediumHigh: 0.033714   // 中风险与高风险的分界点
+                lowMedium: 0.006459,   // 低风险与中风险的分界点
+                mediumHigh: 0.038784   // 中风险与高风险的分界点
             };
             
             // 5年累积基础风险
@@ -349,8 +351,8 @@
                 }
                 
                 // 验证吸烟包年数
-                if (isNaN(smoking_pyrs) || smoking_pyrs < 0 || smoking_pyrs > 70) {
-                    showError('The number of smoking Pack-Years must be between 0-70.');
+                if (isNaN(smoking_pyrs) || smoking_pyrs < 0 || smoking_pyrs > 150) {
+                    showError('The number of smoking Pack-Years must be between 0-150.');
                     return false;
                 }
                 
@@ -362,9 +364,30 @@
                     {name: 'Cytokeratin 19 Fragment (CYFRA 21-1) (ng/mL) ', value: CYFRA_211, id: 'CYFRA_211'}
                 ];
                 
+                // 验证HBsAg
+                if (isNaN(HBsAg) || HBsAg < 0 || HBsAg > 250) {
+                    showError('The value of HBsAg must be between 0-250.');
+                    return false;
+                }
+                // 验证AFP
+                if (isNaN(AFP) || AFP < 0 || AFP > 200) {
+                    showError('The value of AFP must be between 0-200.');
+                    return false;
+                }
+                // 验证CYFRA_211
+                if (isNaN(CYFRA_211) || CYFRA_211 < 0 || CYFRA_211 > 20) {
+                    showError('The value of CYFRA_211 must be between 0-20.');
+                    return false;
+                }
+                // 验证CEA
+                if (isNaN(CEA) || CEA < 0 || CEA > 50) {
+                    showError('The value of CEA must be between 0-50.');
+                    return false;
+                }
+
                 for (const biomarker of biomarkers) {
-                    if (isNaN(biomarker.value) || biomarker.value < 0 || biomarker.value > 1000) {
-                        showError(`${biomarker.name} must be between 0-1000.`);
+                    if (isNaN(biomarker.value) || biomarker.value < 0 || biomarker.value > 999) {
+                        showError(`${biomarker.name} values must fall within the model’s reliable prediction range.`);
                         return false;
                     }
                 }
@@ -443,18 +466,18 @@
                 if (riskPercentage < riskThresholds.lowMedium * 100) {
                     riskLevel = 'Low Risk';
                     riskClass = 'low-risk';
-                    interpretation = 'Your risk level is <strong>Low Risk</strong>, belonging to the level of good health.';
-                    advice = 'Continue to maintain a healthy diet and engage in moderate exercise.';
+                    interpretation = 'Your risk level is <strong>Low Risk</strong>, which means that you are belonging to the level of good health.';
+                    advice = 'Continue to maintain a healthy lifestyle.';
                 } else if (riskPercentage < riskThresholds.mediumHigh * 100) {
                     riskLevel = 'Intermediate Risk';
                     riskClass = 'medium-risk';
-                    interpretation = 'Your risk level is <strong>Intermediate Risk</strong>, requires active intervention.';
-                    advice = 'It is recommended to consult a professional doctor and engage in health management, and regularly monitor key indicators.';
+                    interpretation = 'Your risk level is <strong>Intermediate Risk</strong>, which means that you are at an average risk compared to the general population.';
+                    advice = 'It is recommended to undergo regular health check-ups and maintain a healthy lifestyle, as these are essential for monitoring your health status and potentially reducing your future risk.';
                 } else {
                     riskLevel = 'High Risk';
                     riskClass = 'high-risk';
-                    interpretation = 'Your risk level is <strong>High Risk</strong>, immediate professional medical intervention is required.';
-                    advice = 'Please seek medical attention immediately for a detailed examination and the formulation of a treatment plan.';
+                    interpretation = 'Your risk level is <strong>High Risk</strong>, which means that you are at above average risk compared to the general population.';
+                    advice = 'It is strongly recommended that you undergo annual medical check-ups and adopt a healthy lifestyle to help manage and reduce your risk.';
                 }
                 
                 // 设置风险值颜色
