@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penta-Cancer Risk Identification Model Calculator</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <img src="/Users/renjia/Desktop/logo1.jpg" alt="Site Logo" style="height: 100px;">
+    <img src="/Users/renjia/Desktop/logo2.jpg" alt="Site Logo" style="height: 100px;">
     <style>
         * {
             box-sizing: border-box;
@@ -207,11 +209,13 @@
         }
     </style>
 </head>
+
 <body>
     <div class="calculator-container">
         <header>
             <h1>Penta-Cancer Risk Identification Model Calculator</h1>
             <p class="description">"FuSion" Pan-cancer Early Screening Project</p>
+            <p class="description">Zhao et.al, <i>Journal Name</i>, 2025. Doi:XXX.XXX</p>
         </header>
         
         <div class="error-message" id="errorMessage"></div>
@@ -238,6 +242,7 @@
             
             <div class="form-group">
                 <label for="AFP">Alpha-fetoprotein (AFP) (ng/mL)</label>
+                <div class="formula-note">&nbsp;</div>
                 <input type="number" id="AFP" min="0" max="200" step="1" placeholder="0-200 ng/mL">
             </div>
             
@@ -282,6 +287,7 @@
         
         <footer>
             <p>© 2025 Fudan University Taizhou Institute of Health Sciences</p>
+            <p>© Zhao et.al, <i>Journal Name</i>, 2025. Doi:XXX.XXX</p>
         </footer>
     </div>
 
@@ -497,6 +503,10 @@
                     <p>${interpretation}</p>
                     <p><strong>Medical advice:</strong> ${advice}</p>
                     <p>Risk factor analysis: The risk calculation results integrate multiple factors such as age, gender, smoking history, and biomarker levels.</p>
+                    <p><strong>Risk group definition:</strong></p>
+                    <p><strong>Low Risk:</strong> <0.646%.</p>
+                    <p><strong>Intermediate Risk:</strong> 0.646% to 3.878%.</p>
+                    <p><strong>High Risk:</strong> >3.878%.</p>
                 `;
             }
         });
