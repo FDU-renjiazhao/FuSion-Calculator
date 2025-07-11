@@ -266,6 +266,7 @@
             <button id="calculateBtn">Calculate Risk Probability</button>
         </div>
         
+
         <div class="result-container" id="resultSection">
             <div class="risk-level">
                 Your 5-year risk probability for occurring one of the following cancers — lung, esophageal, gastric, liver, or colorectal — is:
@@ -280,7 +281,7 @@
             
             <div class="explanation">
                 <p>Note: This tool calculates risk values based on a predictive model algorithm from clinical research. The results are for reference only and cannot replace professional medical diagnosis. If you have health concerns, please consult a medical professional.</p>
-                <p>      </p>
+                <p>&nbsp;</p>
                 <p>Note: If any of your input values exceed the model’s acceptable range (except age), you may enter the maximum allowed value to proceed with the prediction. However, this suggests that you may already be in a high-risk group for cancer, and it is strongly recommended that you seek medical evaluation.</p>
             </div>
         </div>
@@ -435,7 +436,9 @@
                 // 计算5年风险概率（使用正确的公式）
                 const riskProbability = 1 - Math.exp(-baseHazardAt5Years * riskScore);
                 const riskPercentage = Math.min(Math.max(riskProbability, 0), 1) * 100;
-                
+                const riskRatio = (riskPercentage/100)/0.012918;
+                riskRatio.text = riskRatio.toFixed(2)
+
                 // 显示结果
                 const riskValueEl = document.getElementById('riskValue');
                 riskValueEl.textContent = riskPercentage.toFixed(2) + '%';
@@ -472,17 +475,27 @@
                 if (riskPercentage < riskThresholds.lowMedium * 100) {
                     riskLevel = 'Low Risk';
                     riskClass = 'low-risk';
-                    interpretation = 'Your risk level is <strong>Low Risk</strong>, which means that you are belonging to the level of good health.';
+                    interpretation = `Your risk level is <strong>Low Risk</strong>, and your estimated cancer risk is <strong>${(100-(riskPercentage/100)/0.01291*100).toFixed(2) + '%'}</strong> lower than the average population.`;
                     advice = 'Continue to maintain a healthy lifestyle.';
                 } else if (riskPercentage < riskThresholds.mediumHigh * 100) {
                     riskLevel = 'Intermediate Risk';
                     riskClass = 'medium-risk';
-                    interpretation = 'Your risk level is <strong>Intermediate Risk</strong>, which means that you are at an average risk compared to the general population.';
-                    advice = 'It is recommended to undergo regular health check-ups and maintain a healthy lifestyle, as these are essential for monitoring your health status and potentially reducing your future risk.';
+
+                    const riskRatio = (riskPercentage / 100) / 0.01291;
+                    const riskRatioFormatted = riskRatio.toFixed(2);
+
+                    if (riskRatio > 1) {
+                    interpretation = `Your risk level is <strong>Intermediate Risk</strong>, and your estimated cancer risk is <strong>${riskRatioFormatted}</strong> times higher than the average population.`;
+                } else {
+                    interpretation = `Your risk level is <strong>Intermediate Risk</strong>, and your estimated cancer risk is <strong>${(100-(riskPercentage/100)/0.01291*100).toFixed(2) + '%'}</strong> lower than the average population.`;
+                }
+
+                advice = 'It is recommended to undergo regular health check-ups and maintain a healthy lifestyle, as these are essential for monitoring your health status and potentially reducing your future risk.';
+
                 } else {
                     riskLevel = 'High Risk';
                     riskClass = 'high-risk';
-                    interpretation = 'Your risk level is <strong>High Risk</strong>, which means that you are at above average risk compared to the general population.';
+                    interpretation = `Your risk level is <strong>High Risk</strong>, and your estimated cancer risk is <strong>${((riskPercentage/100)/0.01291).toFixed(2)}</strong> times higher than the average population.`;
                     advice = 'It is strongly recommended that you undergo annual medical check-ups and adopt a healthy lifestyle to help manage and reduce your risk.';
                 }
                 
@@ -501,12 +514,13 @@
                 
                 interpretationEl.innerHTML = `
                     <p>${interpretation}</p>
+                    <p>&nbsp;</p>
                     <p><strong>Medical advice:</strong> ${advice}</p>
-                    <p>Risk factor analysis: The risk calculation results integrate multiple factors such as age, gender, smoking history, and biomarker levels.</p>
-                    <p><strong>Risk group definition:</strong></p>
-                    <p><strong>Low Risk:</strong> <0.646%.</p>
-                    <p><strong>Intermediate Risk:</strong> 0.646% to 3.878%.</p>
-                    <p><strong>High Risk:</strong> >3.878%.</p>
+                    <p>&nbsp;</p>
+                    <p><strong>Risk Group Definition:</strong></p>
+                    <p><strong>Low Risk:</strong> Estimated cancer risk is less than half of the average population risk (< 0.646%).</p>
+                    <p><strong>Intermediate Risk:</strong> Estimated cancer risk is between half and three times the average population risk (0.646%–3.878%).</p>
+                    <p><strong>High Risk:</strong> Estimated cancer risk is more than three times the average population risk (> 3.878%).</p>
                 `;
             }
         });
