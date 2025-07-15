@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penta-cancer Risk Identification Model Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <img src="logo1.jpg" alt="Site Logo" style="height: 120px;">
+    <img src="logo2.jpg" alt="Site Logo" style="height: 130px;">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Noto Sans SC', 'Roboto', 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .calculator-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        h1 {
+            color: #2563eb;
+            margin-bottom: 10px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
+        }
+        .description {
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 600px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #444;
+            font-size: 1rem;
+        }
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: 'Noto Sans SC', sans-serif;
+            transition: all 0.2s ease;
+        }
+        input::placeholder {
+            color: #999;
+            font-size: 0.9em;
+        }
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .formula-note {
+            font-size: 0.85em;
+            color: #777;
+            margin-top: 3px;
+            font-weight: 300;
+        }
+        .btn-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 14px 35px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Noto Sans SC', sans-serif;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.1);
+        }
+        button:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(37, 99, 235, 0.15);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .result-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            display: none;
+        }
+        .risk-level {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+        .risk-value {
+            font-size: 3.8rem;
+            margin: 15px 0;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            font-family: 'Roboto', sans-serif;
+            letter-spacing: -1px;
+            color: #e53e3e; /* Default color (high risk) */
+        }
+        .risk-value.low-risk {
+            color: #38a169;
+        }
+        .risk-value.medium-risk {
+            color: #dd6b20;
+        }
+        .risk-value.high-risk {
+            color: #e53e3e;
+        }
+        .risk-level-text {
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 15px 0 25px;
+            transition: all 0.3s ease;
+            font-family: 'Roboto', sans-serif;
+        }
+        .low-risk {
+            color: #38a169;
+        }
+        .medium-risk {
+            color: #dd6b20;
+        }
+        .high-risk {
+            color: #e53e3e;
+        }
+        .interpretation {
+            line-height: 1.7;
+            font-size: 1.05rem;
+            margin-top: 20px;
+        }
+        .interpretation p {
+            margin-bottom: 15px;
+        }
+        .interpretation strong {
+            font-weight: 600;
+        }
+        .explanation {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.6;
+        }
+        footer {
+            text-align: center;
+            margin-top: 35px;
+            color: #777;
+            font-size: 0.95rem;
+        }
+        .error-message {
+            color: #e53e3e;
+            background-color: #fff5f5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator-container">
+        <header>
+            <h1>Penta-cancer Risk Identification Model Calculator</h1>
+            <p class="description">As part of the “FuSion” Pan-cancer Early Screening Project</p>
+            <p class="description">Please refer to Zhao et al., <i>Journal Name</i> (2025). DOI: xxx.xxx </p>
+        </header>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="input-section">
+            <div class="form-group">
+                <label for="age">Age (Years,40-75)</label>
+                <input type="number" id="age" min="40" max="75" placeholder="40-75 Years">
+            </div>
+            
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="smoking_pyrs">Smoking Pack-Years</label>
+                <div class="formula-note">(Cigarettes per day / 20) × Years smoked</div>
+                <input type="number" id="smoking_pyrs" min="0" max="150" placeholder="0-150 Pack-Years">
+            </div>
+            
+            <div class="form-group">
+                <label for="AFP">Alpha-fetoprotein (AFP) (ng/mL)</label>
+                <div class="formula-note">&nbsp;</div>
+                <input type="number" id="AFP" min="0" max="200" step="1" placeholder="0-200 ng/mL">
+            </div>
+            
+            <div class="form-group">
+                <label for="HBsAg">Hepatitis B Surface Antigen (HBsAg) (IU/mL)</label>
+                <input type="number" id="HBsAg" min="0" max="250" step="1" placeholder="0-250 IU/mL">
+            </div>
+            
+            <div class="form-group">
+                <label for="CEA">Carcinoembryonic Antigen (CEA) (ng/mL)</label>
+                <input type="number" id="CEA" min="0" max="50" step="1" placeholder="0-50 ng/mL">
+            </div>
+            
+            <div class="form-group">
+                <label for="CYFRA_211">Cytokeratin 19 Fragment (CYFRA 21-1) (ng/mL)</label>
+                <input type="number" id="CYFRA_211" min="0" max="20" step="1" placeholder="0-20 ng/mL">
+            </div>
+        </div>
+        
+        <div class="btn-container">
+            <button id="calculateBtn">Calculate Risk Probability</button>
+        </div>
+        
+
+        <div class="result-container" id="resultSection">
+            <div class="risk-level">
+                Your 5-year risk probability for occurring one of the following cancers — lung, esophageal, gastric, liver, or colorectal — is:
+                <div class="risk-value" id="riskValue">0%</div>
+            </div>
+            
+            <div class="risk-level-text" id="riskLevelText"></div>
+            
+            <div class="interpretation" id="interpretation">
+                <!-- Interpretation text will be filled by JS -->
+            </div>
+            
+            <div class="explanation">
+                <p>Note: This tool calculates risk values based on a predictive model algorithm from epidemiological research. The results are for reference only and cannot replace professional medical diagnosis. If you have health concerns, please consult a medical professional.</p>
+                <p>&nbsp;</p>
+                <p>Note: If any of your input values exceed the model’s acceptable range (except age), you may enter the maximum allowed value to proceed with the prediction. However, this suggests that you may already be in a high-risk group for cancer, and it is strongly recommended that you seek medical evaluation.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 Fudan University Taizhou Institute of Health Sciences</p>
+            <p>© Zhao et.al, <i>Journal Name</i>, 2025. Doi:XXX.XXX</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 标准化参数 - 已更新为您提供的值
+            const standardizationParams = {
+                AFP: { mean: 2.979271, sd: 2.3401 },
+                CEA: { mean: 2.213704, sd: 2.066604 },
+                CYFRA_211: { mean: 2.29182, sd: 0.987915 },
+                HBsAg: { mean: 19.35079, sd: 63.81346 }
+            };
+            
+            // Cox模型系数
+            const coxCoefficients = {
+                age: 0.084455,
+                sex_male: 0.558310,
+                smoking_pyrs: 0.014131,
+                AFP_s: 0.053289,
+                HBsAg_s: 0.125219,
+                CEA_s: 0.085137,
+                CYFRA_211_s: 0.186784
+            };
+            
+            // 风险分级阈值
+            const riskThresholds = {
+                lowMedium: 0.006459,   // 低风险与中风险的分界点
+                mediumHigh: 0.038784   // 中风险与高风险的分界点
+            };
+            
+            // 5年累积基础风险
+            const baseHazardAt5Years = 0.00932424;
+            
+            // 计算按钮事件监听
+            document.getElementById('calculateBtn').addEventListener('click', calculateRisk);
+            
+            function standardizeValue(value, paramName) {
+                const params = standardizationParams[paramName];
+                if (params.sd === 0) return 0; // 避免除以0
+                return (value - params.mean) / params.sd;
+            }
+            
+            function showError(message) {
+                const errorEl = document.getElementById('errorMessage');
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            }
+            
+            function hideError() {
+                document.getElementById('errorMessage').style.display = 'none';
+            }
+            
+            function validateInputs() {
+                hideError();
+                
+                const age = parseFloat(document.getElementById('age').value);
+                const smoking_pyrs = parseFloat(document.getElementById('smoking_pyrs').value) || 0;
+                const AFP = parseFloat(document.getElementById('AFP').value);
+                const HBsAg = parseFloat(document.getElementById('HBsAg').value);
+                const CEA = parseFloat(document.getElementById('CEA').value);
+                const CYFRA_211 = parseFloat(document.getElementById('CYFRA_211').value);
+                
+                // 验证年龄范围
+                if (isNaN(age) || age < 40 || age > 75) {
+                    showError('The age must be between 40-75 years old.');
+                    return false;
+                }
+                
+                // 验证吸烟包年数
+                if (isNaN(smoking_pyrs) || smoking_pyrs < 0 || smoking_pyrs > 150) {
+                    showError('The number of smoking Pack-Years must be between 0-150.');
+                    return false;
+                }
+                
+                // 验证生物标志物
+                const biomarkers = [
+                    {name: 'Alpha-fetoprotein (AFP) (ng/mL) ', value: AFP, id: 'AFP'},
+                    {name: 'Hepatitis B Surface Antigen (HBsAg) (IU/mL) ', value: HBsAg, id: 'HBsAg'},
+                    {name: 'Carcinoembryonic Antigen (CEA) (ng/mL) ', value: CEA, id: 'CEA'},
+                    {name: 'Cytokeratin 19 Fragment (CYFRA 21-1) (ng/mL) ', value: CYFRA_211, id: 'CYFRA_211'}
+                ];
+                
+                // 验证HBsAg
+                if (isNaN(HBsAg) || HBsAg < 0 || HBsAg > 250) {
+                    showError('The value of HBsAg must be between 0-250.');
+                    return false;
+                }
+                // 验证AFP
+                if (isNaN(AFP) || AFP < 0 || AFP > 200) {
+                    showError('The value of AFP must be between 0-200.');
+                    return false;
+                }
+                // 验证CYFRA_211
+                if (isNaN(CYFRA_211) || CYFRA_211 < 0 || CYFRA_211 > 20) {
+                    showError('The value of CYFRA_211 must be between 0-20.');
+                    return false;
+                }
+                // 验证CEA
+                if (isNaN(CEA) || CEA < 0 || CEA > 50) {
+                    showError('The value of CEA must be between 0-50.');
+                    return false;
+                }
+
+                for (const biomarker of biomarkers) {
+                    if (isNaN(biomarker.value) || biomarker.value < 0 || biomarker.value > 999) {
+                        showError(`${biomarker.name} values must fall within the model’s reliable prediction range.`);
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            function calculateRisk() {
+                if (!validateInputs()) return;
+                
+                // 获取用户输入值
+                const age = parseFloat(document.getElementById('age').value);
+                const isMale = document.getElementById('gender').value === 'male';
+                const smoking_pyrs = parseFloat(document.getElementById('smoking_pyrs').value) || 0;
+                const AFP = parseFloat(document.getElementById('AFP').value);
+                const HBsAg = parseFloat(document.getElementById('HBsAg').value);
+                const CEA = parseFloat(document.getElementById('CEA').value);
+                const CYFRA_211 = parseFloat(document.getElementById('CYFRA_211').value);
+                
+                // 标准化生物标志物
+                const AFP_s = standardizeValue(AFP, 'AFP');
+                const HBsAg_s = standardizeValue(HBsAg, 'HBsAg');
+                const CEA_s = standardizeValue(CEA, 'CEA');
+                const CYFRA_211_s = standardizeValue(CYFRA_211, 'CYFRA_211');
+                
+                // 计算线性预测值(需要减去offset value)
+                const linearPredictor = 
+                    coxCoefficients.age * age +
+                    (isMale ? coxCoefficients.sex_male : 0) +
+                    coxCoefficients.smoking_pyrs * smoking_pyrs +
+                    coxCoefficients.AFP_s * AFP_s +
+                    coxCoefficients.HBsAg_s * HBsAg_s +
+                    coxCoefficients.CEA_s * CEA_s +
+                    coxCoefficients.CYFRA_211_s * CYFRA_211_s - 
+                    4.565443;
+                
+                // 计算风险评分
+                const riskScore = Math.exp(linearPredictor);
+                
+                // 计算5年风险概率（使用正确的公式）
+                const riskProbability = 1 - Math.exp(-baseHazardAt5Years * riskScore);
+                const riskPercentage = Math.min(Math.max(riskProbability, 0), 1) * 100;
+                const riskRatio = (riskPercentage/100)/0.012918;
+                riskRatio.text = riskRatio.toFixed(2)
+
+                // 显示结果
+                const riskValueEl = document.getElementById('riskValue');
+                riskValueEl.textContent = riskPercentage.toFixed(2) + '%';
+                
+                // 添加动画效果
+                riskValueEl.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    riskValueEl.style.transform = 'scale(1)';
+                }, 300);
+                
+                // 生成风险解释
+                generateInterpretation(riskPercentage);
+                document.getElementById('resultSection').style.display = 'block';
+                
+                // 滚动到结果区域
+                setTimeout(() => {
+                    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
+            
+            function generateInterpretation(riskPercentage) {
+                const interpretationEl = document.getElementById('interpretation');
+                const riskLevelTextEl = document.getElementById('riskLevelText');
+                const riskValueEl = document.getElementById('riskValue');
+                
+                let interpretation = '';
+                let advice = '';
+                let riskLevel = '';
+                let riskClass = '';
+                
+                // 重置类名
+                riskValueEl.className = 'risk-value';
+                
+                if (riskPercentage < riskThresholds.lowMedium * 100) {
+                    riskLevel = 'Low Risk';
+                    riskClass = 'low-risk';
+                    interpretation = `Your risk level is <strong>Low Risk</strong>, and your estimated cancer risk is <strong>${(100-(riskPercentage/100)/0.01291*100).toFixed(2) + '%'}</strong> lower than the average population.`;
+                    advice = 'Continue to maintain a healthy lifestyle.';
+                } else if (riskPercentage < riskThresholds.mediumHigh * 100) {
+                    riskLevel = 'Intermediate Risk';
+                    riskClass = 'medium-risk';
+
+                    const riskRatio = (riskPercentage / 100) / 0.01291;
+                    const riskRatioFormatted = riskRatio.toFixed(2);
+
+                    if (riskRatio > 1) {
+                    interpretation = `Your risk level is <strong>Intermediate Risk</strong>, and your estimated cancer risk is <strong>${riskRatioFormatted}</strong> times higher than the average population.`;
+                } else {
+                    interpretation = `Your risk level is <strong>Intermediate Risk</strong>, and your estimated cancer risk is <strong>${(100-(riskPercentage/100)/0.01291*100).toFixed(2) + '%'}</strong> lower than the average population.`;
+                }
+
+                advice = 'It is recommended to undergo regular health check-ups and maintain a healthy lifestyle, as these are essential for monitoring your health status and potentially reducing your future risk.';
+
+                } else {
+                    riskLevel = 'High Risk';
+                    riskClass = 'high-risk';
+                    interpretation = `Your risk level is <strong>High Risk</strong>, and your estimated cancer risk is <strong>${((riskPercentage/100)/0.01291).toFixed(2)}</strong> times higher than the average population.`;
+                    advice = 'It is strongly recommended that you undergo annual medical check-ups and adopt a healthy lifestyle to help manage and reduce your risk.';
+                }
+                
+                // 设置风险值颜色
+                riskValueEl.classList.add(riskClass);
+                
+                // 设置风险级别文本和样式
+                riskLevelTextEl.textContent = riskLevel;
+                riskLevelTextEl.className = 'risk-level-text ' + riskClass;
+                
+                // 添加动画效果
+                riskLevelTextEl.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    riskLevelTextEl.style.transform = 'scale(1)';
+                }, 300);
+                
+                interpretationEl.innerHTML = `
+                    <p>${interpretation}</p>
+                    <p>&nbsp;</p>
+                    <p><strong>Advice:</strong> ${advice}</p>
+                    <p>&nbsp;</p>
+                    <p><strong>Risk Group Definition:</strong></p>
+                    <p><strong>Low Risk:</strong> Estimated cancer risk is less than half of the average population risk (< 0.646%).</p>
+                    <p><strong>Intermediate Risk:</strong> Estimated cancer risk is between half and three times the average population risk (0.646%–3.878%).</p>
+                    <p><strong>High Risk:</strong> Estimated cancer risk is more than three times the average population risk (> 3.878%).</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
